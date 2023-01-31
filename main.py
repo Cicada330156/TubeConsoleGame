@@ -1,5 +1,7 @@
 
-
+# 1/31/23
+# CSU ACM Chapter
+# Tube Game v0
 
 print("Welcome to the game")
 print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
