@@ -15,7 +15,7 @@ print("Enter a 'from -> to' command to move marbles and 'show' to show the state
 
 
 # The look we want for the output of the state of the game
-# | |   | |
+# |B|   | |
 # |R|   | |
 # |B|   | |
 # |G|   |R|
@@ -23,8 +23,61 @@ print("Enter a 'from -> to' command to move marbles and 'show' to show the state
 
 
 class Tube:
-    pass
+    
+    def __init__(self, capacity, initial_marble_count, marble_description):
+        
+        self._stack = []
+        self._capacity = capacity
+        
+        for i in range(initial_marble_count):
+            self.add_marble(marble_description)
+    
+    def get_capacity(self):
+        '''Getter for the capacity of the tube.'''
+        return self._capacity
+    
+    def add_marble(self, marble_description):
+        '''Attempt to add a marble to the top of the tube. If there is no room, the marble is not added.
+        This method return the success of the addition.'''
+        
+        did_add = False
+        
+        if len(self._stack) < self._capacity:
+            self._stack.append(marble_description)
+            did_add = True
+        
+        return did_add
+        
+    def remove_marble(self):
+        '''This method remove the top marble from the tube and returns it. If the tube is empty, return None.'''
+        
+        removed_marble = None
+        
+        if len(self._stack) != 0:
+            remove_marble = self._stack.pop()
+        
+        return removed_marble
+        
+    
+    def get_marble_color(self, position):
+        '''Return the marble/color description at the passed position (starting at 0). If the position contains no marbles, then return a single space (" ").'''
+        
+        result = " "
+        
+        if len(self._stack) > position:
+            result = self._stack[position]
+        
+        return result
+        
+        
+    
 
+def make_string_from_tubes(tube_list):
+    result = ""
+    
+    
+    
+    return result
 
 class GameManager:
     
@@ -76,6 +129,26 @@ def interpret_input(user_input):
 game_manager = GameManager()
 game_manager.do_something()
 
-user_input = input("Input something: ")
-command_result = interpret_input(user_input)
-print(command_result)
+#user_input = input("Input something: ")
+#command_result = interpret_input(user_input)
+#print(command_result)
+
+
+
+def check_tube_contents(tube):
+    print("-")
+    for index in range(tube.get_capacity()-1, -1, -1):
+        
+        print(tube.get_marble_color(index))
+    print("-")
+
+
+test_tube = Tube(5, 3, "R")
+test_tube.add_marble("B")
+test_tube.add_marble("Y")
+test_tube.remove_marble()
+test_tube.add_marble("G")
+
+check_tube_contents(test_tube)
+
+
