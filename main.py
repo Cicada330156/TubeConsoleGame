@@ -135,8 +135,29 @@ def make_string_from_tubes(tube_list):
 
 class GameManager:
     
-    def do_something(self):
+    def __init__(self):
         print("The game has started!")
+    
+    
+    def start_game(self):
+        
+        print("Welcome to the game")
+        print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
+        
+        is_playing = True
+        
+        while is_playing:
+            # Game loop:
+            
+            user_input = input("Enter your command: ")
+            command = interpret_input(user_input)
+            
+            if command.command_name == "Quit":
+                is_playing = False
+            elif command.command_name == "Invalid":
+                print("Sorry, but that is not a valid command.")
+        
+        print("Thank you for playing!")
 
 
 
@@ -163,6 +184,9 @@ def interpret_input(user_input):
     
     if user_input.lower().strip() == "show":
         result = Command("Show")
+        
+    elif user_input.lower().strip() == "quit":
+        result = Command("Quit")
         
     elif "->" in user_input:
         
@@ -195,10 +219,8 @@ def interpret_input(user_input):
 # ------------------------------------------------- Gameplay ------------------------------------------------ #
 # ----------------------------------------------------------------------------------------------------------- #
 
-
-print("Welcome to the game")
-print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
-
+game_manager = GameManager()
+game_manager.start_game()
 
 # ----------------------------------------------------------------------------------------------------------- #
 # -------------------------------------------------  Testing ------------------------------------------------ #
