@@ -1,10 +1,7 @@
 
-# 1/31/23
+# 2/14/23
 # CSU ACM Chapter
-# Tube Game v0
-
-print("Welcome to the game")
-print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
+# Tube Game v0.2
 
 # Components : tubes, game manager, command interpreter
 
@@ -15,12 +12,17 @@ print("Enter a 'from -> to' command to move marbles and 'show' to show the state
 
 
 # The look we want for the output of the state of the game
-# |B|   | |
-# |R|   | |
-# |B|   | |
-# |G|   |R|
+# | |   | |
+# |G|   |B|
+# |G|   |B|
+# |G|   |B|
 # |-|   |-|
 
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# --------------------------------------------------  Tubes ------------------------------------------------- #
+# ----------------------------------------------------------------------------------------------------------- #
 
 class Tube:
     
@@ -29,7 +31,7 @@ class Tube:
         self._stack = []
         self._capacity = capacity
         
-        for i in range(initial_marble_count):
+        for _ in range(initial_marble_count):
             self.add_marble(marble_description)
     
     def get_capacity(self):
@@ -68,21 +70,82 @@ class Tube:
             result = self._stack[position]
         
         return result
-        
-        
+
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# ------------------------------------------------  Printing ------------------------------------------------ #
+# ----------------------------------------------------------------------------------------------------------- #
+
+
+def get_highest_capacity(tube_list):
+    
+    # return max( [tube.get_capacity() for tube in tube_list] )
+    
+    running_highest = 0
+    
+    for tube in tube_list:
+        capacity = tube.get_capacity()
+        if capacity > running_highest:
+            running_highest = capacity
+    
+    return running_highest
+    
+    
     
 
 def make_string_from_tubes(tube_list):
     result = ""
     
+    tallest_height = get_highest_capacity(tube_list)
+    working_height = tallest_height - 1
     
+    while working_height >= 0:
+        
+        for tube in tube_list:
+            
+            if tube.get_capacity() - 1 >= working_height:
+                # Put in the tube's edges and the marble inside (if any)
+                result += "|" + tube.get_marble_color(working_height) + "|"
+            else:
+                # Print a few spaces
+                result += "   "
+                
+            # Add the spacing between the tubes
+            result += "   "
+                
+            
+        result += "\n"
+        
+        working_height -= 1
+    
+    # Add the bottoms of the tubes
+    for _ in range(len(tube_list)):
+        result += "|-|   "
     
     return result
+
+
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# ----------------------------------------------- Game Manager ---------------------------------------------- #
+# ----------------------------------------------------------------------------------------------------------- #
+
 
 class GameManager:
     
     def do_something(self):
         print("The game has started!")
+
+
+
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# ------------------------------------------------- Commands ------------------------------------------------ #
+# ----------------------------------------------------------------------------------------------------------- #
+
 
 
 class Command:
@@ -126,8 +189,26 @@ def interpret_input(user_input):
     return result
     
 
-game_manager = GameManager()
-game_manager.do_something()
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# ------------------------------------------------- Gameplay ------------------------------------------------ #
+# ----------------------------------------------------------------------------------------------------------- #
+
+
+print("Welcome to the game")
+print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
+
+
+# ----------------------------------------------------------------------------------------------------------- #
+# -------------------------------------------------  Testing ------------------------------------------------ #
+# ----------------------------------------------------------------------------------------------------------- #
+
+
+
+
+#game_manager = GameManager()
+#game_manager.do_something()
 
 #user_input = input("Input something: ")
 #command_result = interpret_input(user_input)
@@ -135,20 +216,30 @@ game_manager.do_something()
 
 
 
-def check_tube_contents(tube):
-    print("-")
-    for index in range(tube.get_capacity()-1, -1, -1):
-        
-        print(tube.get_marble_color(index))
-    print("-")
+#def check_tube_contents(tube):
+#    print("-")
+#    for index in range(tube.get_capacity()-1, -1, -1):
+#
+#        print(tube.get_marble_color(index))
+#    print("-")
 
 
-test_tube = Tube(5, 3, "R")
-test_tube.add_marble("B")
-test_tube.add_marble("Y")
-test_tube.remove_marble()
-test_tube.add_marble("G")
+#test_tube = Tube(5, 3, "R")
+#test_tube.add_marble("B")
+#test_tube.add_marble("Y")
+#test_tube.remove_marble()
+#test_tube.add_marble("G")
 
-check_tube_contents(test_tube)
+#check_tube_contents(test_tube)
 
 
+tube_a = Tube(5, 4, "R")
+tube_b = Tube(7, 7, "G")
+tube_c = Tube(6, 3, "B")
+tube_d = Tube(6, 3, "Y")
+
+tube_list = [tube_a, tube_b, tube_c, tube_d]
+
+description = make_string_from_tubes(tube_list)
+
+print(description)
