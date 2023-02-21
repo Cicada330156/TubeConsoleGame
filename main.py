@@ -1,10 +1,10 @@
-
-# 2/14/23
+# 2/21/23
 # CSU ACM Chapter
-# Tube Game v0.2
+# Tube Game v0.3
 
 # Components : tubes, game manager, command interpreter
 
+import random
 
 # The forms of the commands:
 # "Source -> Sink" : for example, "1 -> 2"
@@ -80,7 +80,7 @@ class Tube:
 
 def get_highest_capacity(tube_list):
     
-    # return max( [tube.get_capacity() for tube in tube_list] )
+    # return max(tube.get_capacity() for tube in tube_list)
     
     running_highest = 0
     
@@ -132,30 +132,103 @@ def make_string_from_tubes(tube_list):
 # ----------------------------------------------- Game Manager ---------------------------------------------- #
 # ----------------------------------------------------------------------------------------------------------- #
 
+# Create a method for creating new games
+#   1. Create the tubes
+#   2. Randomize the marble within the tubes
+#   3. Randomize the tubes
+# Add a loop that reads input, parses that input for commands
+# In the loop, we want to process those commands
+# Add a system for tracking points
+# Create some method for detecting if the player has won
+# Add a check to see if the player has lost (ran out of points)
+# Maybe add a new game command
+
+
+list_of_color = ["R", "G", "B", "Y", "P", "O"]
+random_iterations = 200
 
 class GameManager:
     
     def __init__(self):
-        print("The game has started!")
+        print("Welcome to the game!")
+        self.is_playing = True
+        self.tubes = []
+        self.start_simple_game(3)
+        
+    def start_simple_game(self, number_of_tubes):
+        tube_parameters = []
+        maximum_tubes_count = len(list_of_color)
+        
+        for tube_index in range(min(number_of_tubes, maximum_tubes_count)):
+            tube_parameters.append( (6, 4, list_of_color[tube_index]) )
+            
+        self.start_new_game(tube_parameters)
     
+    # tube_parameters is a list of objects of the following form (tube capacity, initial marble count, color string)
+    def start_new_game(self, tube_parameters):
+    
+        # Inform the user started a game
+        print("The game has started!")
+        
+        self.is_playing = True
+        self.tubes = []
+        
+        # Populate the tubes list with new tubes
+        for tube_characteristics in tube_parameters:
+            tube_capacity = tube_characteristics[0]
+            initial_marble_count = tube_characteristics[1]
+            color_string = tube_characteristics[2]
+            
+            # Create a new tube and add it
+            new_tube = Tube(tube_capacity, initial_marble_count, color_string)
+            self.tubes.append(new_tube)
+            
+        last_tube_index = len(tube_parameters) - 1
+        for _ in range(random_iterations):
+            self.move_marble(random.randint(0, last_tube_index), random.randint(0, last_tube_index))
+            
+    def move_marble(self, from_tube_index, to_tube_index):
+    
+        did_move = False
+        
+        from_tube = self.tubes[from_tube_index]
+        from_marble = from_tube.remove_marble()
+        
+        # Check if there was a marble in the tube
+        if from_marble is not None:
+            to_tube = self.tubes[to_tube_index]
+            did_add = to_tube.add_marble(from_marble)
+            
+            # If the to_tube cannot take the marble, we add it back to the original tube
+            if did_add:
+                did_move = True
+            else:
+                from_tube.add_marble(from_marble)
+                
+        return did_move
+        
     
     def start_game(self):
         
         print("Welcome to the game")
         print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
         
-        is_playing = True
+        is_executing = True
         
-        while is_playing:
+        while is_executing:
             # Game loop:
             
             user_input = input("Enter your command: ")
             command = interpret_input(user_input)
             
             if command.command_name == "Quit":
-                is_playing = False
+                is_executing = False
+            elif command.command_name == "Show":
+                print(make_string_from_tubes(self.tubes))
             elif command.command_name == "Invalid":
                 print("Sorry, but that is not a valid command.")
+            else:
+                pass
         
         print("Thank you for playing!")
 
@@ -219,8 +292,9 @@ def interpret_input(user_input):
 # ------------------------------------------------- Gameplay ------------------------------------------------ #
 # ----------------------------------------------------------------------------------------------------------- #
 
-game_manager = GameManager()
-game_manager.start_game()
+if __name__ == "__main__":
+    game_manager = GameManager()
+    game_manager.start_game()
 
 # ----------------------------------------------------------------------------------------------------------- #
 # -------------------------------------------------  Testing ------------------------------------------------ #
@@ -255,13 +329,13 @@ game_manager.start_game()
 #check_tube_contents(test_tube)
 
 
-tube_a = Tube(5, 4, "R")
-tube_b = Tube(7, 7, "G")
-tube_c = Tube(6, 3, "B")
-tube_d = Tube(6, 3, "Y")
-
-tube_list = [tube_a, tube_b, tube_c, tube_d]
-
-description = make_string_from_tubes(tube_list)
-
-print(description)
+#tube_a = Tube(5, 4, "R")
+#tube_b = Tube(7, 7, "G")
+#tube_c = Tube(6, 3, "B")
+#tube_d = Tube(6, 3, "Y")
+#
+#tube_list = [tube_a, tube_b, tube_c, tube_d]
+#
+#description = make_string_from_tubes(tube_list)
+#
+#print(description)
