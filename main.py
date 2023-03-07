@@ -1,6 +1,6 @@
-# 2/21/23
+# 3/7/23
 # CSU ACM Chapter
-# Tube Game v0.3
+# Tube Game v0.4
 
 # Components : tubes, game manager, command interpreter
 
@@ -37,6 +37,11 @@ class Tube:
     def get_capacity(self):
         '''Getter for the capacity of the tube.'''
         return self._capacity
+        
+    def get_variety_count(self):
+        '''Gets the number of types of marbles in the tube.'''
+        marble_set = set(self._stack)
+        return len(marble_set)
     
     def add_marble(self, marble_description):
         '''Attempt to add a marble to the top of the tube. If there is no room, the marble is not added.
@@ -56,7 +61,7 @@ class Tube:
         removed_marble = None
         
         if len(self._stack) != 0:
-            remove_marble = self._stack.pop()
+            removed_marble = self._stack.pop()
         
         return removed_marble
         
@@ -132,20 +137,13 @@ def make_string_from_tubes(tube_list):
 # ----------------------------------------------- Game Manager ---------------------------------------------- #
 # ----------------------------------------------------------------------------------------------------------- #
 
-# Create a method for creating new games
-#   1. Create the tubes
-#   2. Randomize the marble within the tubes
-#   3. Randomize the tubes
-# Add a loop that reads input, parses that input for commands
-# In the loop, we want to process those commands
-# Add a system for tracking points
-# Create some method for detecting if the player has won
-# Add a check to see if the player has lost (ran out of points)
-# Maybe add a new game command
+# Challenge: add a "new game" command
 
-
+# The list a default colors when creating a simple game (call start_simple_game)
 list_of_color = ["R", "G", "B", "Y", "P", "O"]
-random_iterations = 200
+
+# The number of moves performed during the shuffle during a new game
+random_iterations = 1000
 
 class GameManager:
     
@@ -153,6 +151,7 @@ class GameManager:
         print("Welcome to the game!")
         self.is_playing = True
         self.tubes = []
+        self.score = 0
         self.start_simple_game(3)
         
     def start_simple_game(self, number_of_tubes):
@@ -165,13 +164,14 @@ class GameManager:
         self.start_new_game(tube_parameters)
     
     # tube_parameters is a list of objects of the following form (tube capacity, initial marble count, color string)
-    def start_new_game(self, tube_parameters):
+    def start_new_game(self, tube_parameters, initial_score=100):
     
         # Inform the user started a game
         print("The game has started!")
         
         self.is_playing = True
         self.tubes = []
+        self.score = initial_score
         
         # Populate the tubes list with new tubes
         for tube_characteristics in tube_parameters:
@@ -183,9 +183,44 @@ class GameManager:
             new_tube = Tube(tube_capacity, initial_marble_count, color_string)
             self.tubes.append(new_tube)
             
-        last_tube_index = len(tube_parameters) - 1
-        for _ in range(random_iterations):
-            self.move_marble(random.randint(0, last_tube_index), random.randint(0, last_tube_index))
+        # Shuffle the contents of the tube
+        self.shuffle_tubes()
+    
+    def check_if_won(self):
+        
+        each_tube_has_unique = True
+        
+        # Check if each tube has at max 1 kind of marble in it
+        for tube in self.tubes:
+            if tube.get_variety_count() > 1:
+                each_tube_has_unique = False
+                break
+        
+        # Check if the player has won (congratulate if so)
+        if each_tube_has_unique:
+            print("You have won! Good job!")
+            self.is_playing = False
+        
+        return each_tube_has_unique
+        
+    
+    def decrease_score(self, amount=1):
+        if self.is_playing:
+            self.score = max(0, self.score - amount)
+            
+            if self.score <= 0:
+                print("You lost! You can still keeping playing the level, though.")
+                
+                # If you want the game to restart, you can use the following:
+                # self.start_simple_game(3)
+    
+    def shuffle_tubes(self, shuffle_iterations=random_iterations):
+        
+        last_tube_index = len(self.tubes) - 1
+        for _ in range(shuffle_iterations):
+            from_index = random.randint(0, last_tube_index)
+            to_index = random.randint(0, last_tube_index)
+            self.move_marble(from_index, to_index)
             
     def move_marble(self, from_tube_index, to_tube_index):
     
@@ -207,6 +242,40 @@ class GameManager:
                 
         return did_move
         
+    # NOTE: this uses the user-entered indices (off by one)
+    def player_requests_move(self, from_index, to_index):
+        
+        can_move = True
+        out_of_range = False
+        last_tube_index = len(self.tubes)
+        
+        if not self.is_playing:
+            print("You already won.")
+            can_move = False
+        
+        if from_index not in range(1, last_tube_index+1):
+            print(f"The first index ({from_index}) is not valid!")
+            can_move = False
+            out_of_range = True
+                
+        if to_index not in range(1, last_tube_index+1):
+            print(f"The second index ({to_index}) is not valid!")
+            can_move = False
+            out_of_range = True
+        
+        if from_index == to_index:
+            print(f"The indices (both {from_index}) must be different!")
+            can_move = False
+        
+        if can_move:
+            did_move = self.move_marble(from_index - 1, to_index - 1)
+            if did_move:
+                self.check_if_won()
+                self.decrease_score()
+            else:
+                print("You cannot do that!")
+        elif out_of_range:
+            print(f"The valid range is from 1 to {last_tube_index}.")
     
     def start_game(self):
         
@@ -224,7 +293,13 @@ class GameManager:
             if command.command_name == "Quit":
                 is_executing = False
             elif command.command_name == "Show":
+                self.decrease_score()
                 print(make_string_from_tubes(self.tubes))
+                print(f"Your score is {self.score}")
+            elif command.command_name == "Move":
+                from_index = command.arguments[0]
+                to_index = command.arguments[1]
+                self.player_requests_move(from_index, to_index)
             elif command.command_name == "Invalid":
                 print("Sorry, but that is not a valid command.")
             else:
