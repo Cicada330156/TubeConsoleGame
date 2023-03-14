@@ -1,6 +1,6 @@
-# 3/7/23
+# 3/14/23
 # CSU ACM Chapter
-# Tube Game v0.4
+# Tube Game v1.0
 
 # Components : tubes, game manager, command interpreter
 
@@ -164,7 +164,7 @@ class GameManager:
         self.start_new_game(tube_parameters)
     
     # tube_parameters is a list of objects of the following form (tube capacity, initial marble count, color string)
-    def start_new_game(self, tube_parameters, initial_score=100):
+    def start_new_game(self, tube_parameters, initial_score=10):
     
         # Inform the user started a game
         print("The game has started!")
@@ -209,7 +209,7 @@ class GameManager:
             self.score = max(0, self.score - amount)
             
             if self.score <= 0:
-                print("You lost! You can still keeping playing the level, though.")
+                print("You have lost! You can still keeping playing the level, though.")
                 
                 # If you want the game to restart, you can use the following:
                 # self.start_simple_game(3)
@@ -243,6 +243,7 @@ class GameManager:
         return did_move
         
     # NOTE: this uses the user-entered indices (off by one)
+    # This attempts to move a marble
     def player_requests_move(self, from_index, to_index):
         
         can_move = True
@@ -279,7 +280,6 @@ class GameManager:
     
     def start_game(self):
         
-        print("Welcome to the game")
         print("Enter a 'from -> to' command to move marbles and 'show' to show the state of the game")
         
         is_executing = True
@@ -290,6 +290,7 @@ class GameManager:
             user_input = input("Enter your command: ")
             command = interpret_input(user_input)
             
+            # Determine the command and execute the appropriate action
             if command.command_name == "Quit":
                 is_executing = False
             elif command.command_name == "Show":
@@ -371,46 +372,4 @@ if __name__ == "__main__":
     game_manager = GameManager()
     game_manager.start_game()
 
-# ----------------------------------------------------------------------------------------------------------- #
-# -------------------------------------------------  Testing ------------------------------------------------ #
-# ----------------------------------------------------------------------------------------------------------- #
 
-
-
-
-#game_manager = GameManager()
-#game_manager.do_something()
-
-#user_input = input("Input something: ")
-#command_result = interpret_input(user_input)
-#print(command_result)
-
-
-
-#def check_tube_contents(tube):
-#    print("-")
-#    for index in range(tube.get_capacity()-1, -1, -1):
-#
-#        print(tube.get_marble_color(index))
-#    print("-")
-
-
-#test_tube = Tube(5, 3, "R")
-#test_tube.add_marble("B")
-#test_tube.add_marble("Y")
-#test_tube.remove_marble()
-#test_tube.add_marble("G")
-
-#check_tube_contents(test_tube)
-
-
-#tube_a = Tube(5, 4, "R")
-#tube_b = Tube(7, 7, "G")
-#tube_c = Tube(6, 3, "B")
-#tube_d = Tube(6, 3, "Y")
-#
-#tube_list = [tube_a, tube_b, tube_c, tube_d]
-#
-#description = make_string_from_tubes(tube_list)
-#
-#print(description)
