@@ -83,6 +83,14 @@ class Tube:
 # ----------------------------------------------------------------------------------------------------------- #
 
 
+class ansicolors:
+    RED = '\033[31m'
+    GREEN = '\033[32m'
+    YELLOW = '\033[33m' # orange on some systems
+    BLUE = '\033[34m'
+    MAGENTA = '\033[35m'
+
+
 def get_highest_capacity(tube_list):
     
     # return max(tube.get_capacity() for tube in tube_list)
@@ -111,7 +119,18 @@ def make_string_from_tubes(tube_list):
             
             if tube.get_capacity() - 1 >= working_height:
                 # Put in the tube's edges and the marble inside (if any)
-                result += "|" + tube.get_marble_color(working_height) + "|"
+                result += "|"
+                if tube.get_marble_color(working_height) == "R":
+                    result += ansicolors.RED
+                if tube.get_marble_color(working_height) == "G":
+                    result += ansicolors.GREEN
+                if tube.get_marble_color(working_height) == "B":
+                    result += ansicolors.BLUE
+                if tube.get_marble_color(working_height) == "Y":
+                    result += ansicolors.YELLOW
+                if tube.get_marble_color(working_height) == "P":
+                    result += ansicolors.MAGENTA 
+                result += tube.get_marble_color(working_height) + "\033[0m|"
             else:
                 # Print a few spaces
                 result += "   "
